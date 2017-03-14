@@ -1,5 +1,5 @@
 var utils = require('./utils')
-var config = require('../config')
+var config = require('../../vue_simple/config/index')
 var isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
@@ -8,5 +8,10 @@ module.exports = {
       ? config.build.productionSourceMap
       : config.dev.cssSourceMap,
     extract: isProduction
-  })
+  }),
+  postcss: [
+    require('autoprefixer')({
+      browsers: ['last 2 versions']
+    })
+  ]
 }

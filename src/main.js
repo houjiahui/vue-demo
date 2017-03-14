@@ -14,6 +14,17 @@ import axios from 'axios';
 Vue.prototype.$http = axios;
 axios.defaults.withCredentials = true;
 
+/*import third party filter for vue2.x*/
+import filter from 'vue-filter'
+Vue.use(filter);
+
+/*import and use element-ui*/
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-default/index.css'
+
+Vue.use(ElementUI);
+
+
 
 Vue.config.productionTip = false;
 
@@ -24,4 +35,4 @@ new Vue({
   router,
   template: '<App/>',
   components: { App }
-})
+});
