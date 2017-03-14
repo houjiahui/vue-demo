@@ -10,7 +10,7 @@
           <input type="password" placeholder="Password" v-model="password">
           <el-row :gutter="20">
             <el-col :span="6" :offset="1">
-              <el-checkbox v-model="checked">记住密码</el-checkbox>
+              <el-checkbox v-model="checked">记住用户名</el-checkbox>
             </el-col>
             <el-col :span="6" :offset="11">
               <el-button type="primary" size="large" @click="doLogin">登录</el-button>
@@ -25,6 +25,7 @@
 </template>
 
 <script>
+  import {mapMutations} from 'vuex'
   export default{
     name:'Login',
     data(){
@@ -55,8 +56,8 @@
           }
           if(_this.checked){
               localStorage.setItem('username',_this.username);
-              localStorage.setItem('password',_this.password);
           }
+
           _this.$http.post(process.env.API_SERVER + '/api/login?username='+_this.username+'&password='+_this.password)
             .then(function(res){
                 if(res.data.status == 200){
@@ -66,6 +67,7 @@
                     type:'success'
                   });
                   localStorage.setItem('isLogin',true);
+                  _this.setLoginUser({username:_this.username});
                   _this.$router.push('/')
                 }else{
                   _this.$notify({
@@ -77,12 +79,12 @@
             }).catch(function(err){
                 console.log('err:',err);
             });
-        }
+        },
+        ...mapMutations(['setLoginUser'])
     },
     mounted(){
         if(localStorage.getItem('username') && localStorage.getItem('password')){
             this.username = localStorage.getItem('username');
-            this.password = localStorage.getItem('password');
             this.checked = true;
         }
     }
@@ -138,6 +140,12 @@
     box-sizing: border-box;
     padding: 0 20px;
     background: #D3DCE6;
+    color: #475669;
+  }
+  #Login input::-webkit-input-placeholder{
+    color: #8492A6;
+  }
+  #Login input:-moz-placeholder{
     color: #8492A6;
   }
   #Login input:last-of-type{
