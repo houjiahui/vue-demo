@@ -8,7 +8,7 @@ var path = require('path')
 var chalk = require('chalk')
 var shell = require('shelljs')
 var webpack = require('webpack')
-var config = require('../../vue_simple/config/index')
+var config = require('../config/index')
 var webpackConfig = require('./webpack.prod.conf.js')
 
 var spinner = ora('building for production...')

@@ -1,6 +1,6 @@
 var path = require('path')
 var utils = require('./utils')
-var config = require('../../vue_simple/config/index')
+var config = require('../config/index')
 var vueLoaderConfig = require('./vue-loader.conf')
 
 function resolve (dir) {

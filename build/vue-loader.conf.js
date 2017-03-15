@@ -1,5 +1,5 @@
 var utils = require('./utils')
-var config = require('../../vue_simple/config/index')
+var config = require('../config/index')
 var isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {

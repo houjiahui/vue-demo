@@ -14,7 +14,6 @@
       name:'v-header',
       data(){
           return{
-            username:localStorage.getItem('username')
           }
       },
       computed:mapGetters(['loginUser']),
