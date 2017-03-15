@@ -13,7 +13,7 @@
           var _this = this;
           setTimeout(function(){
             _this.setLoadingState(false);
-          },0);
+          },300);
       }
   }
 </script>
