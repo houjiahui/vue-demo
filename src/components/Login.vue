@@ -66,7 +66,6 @@
                     message:res.data.result,
                     type:'success'
                   });
-                  localStorage.setItem('isLogin',true);
                   _this.setLoginUser({username:_this.username});
                   _this.$router.push('/')
                 }else{

@@ -5,8 +5,8 @@
       <div class="sidebar">
         <sidebar></sidebar>
       </div>
-      <div class="mainview">
-        <router-view v-loading="loading" element-loading-text="拼命加载中" class="view"></router-view>
+      <div class="mainview" v-loading="loading" element-loading-text="拼命加载中">
+        <router-view class="view"></router-view>
       </div>
     </div>
     <v-footer></v-footer>
@@ -54,10 +54,11 @@
     z-index: 2;
   }
   .main .mainview{
-    width: 100%;
+    width: calc(100% - 240px);
+    margin-left: 240px;
     height: 100%;
     box-sizing: border-box;
-    padding: 20px 20px 20px 260px;
+    padding: 20px;
     z-index: 1;
   }
   .main .view{

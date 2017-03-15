@@ -125,18 +125,13 @@ var router = new Router({
 router.beforeEach((to,from,next) => {
   store.commit('setLoadingState',true);
   if(to.meta.requestAuth){
-    store.dispatch('checkLogin').then(function(res){
-      next()
-    }).catch(function(err){
-      next('/Login')
-    });
-    if(localStorage.getItem('isLogin') && localStorage.getItem('isLogin') == 'true'){
+    store.dispatch('checkLogin').then(function(){
       document.title = to.meta.title;
       store.commit('setPage',to.name);
-      next();
-    }else{
+      next()
+    }).catch(function(){
       next('/Login')
-    }
+    });
   }else{
     document.title = to.meta.title;
     store.commit('setPage',to.name);

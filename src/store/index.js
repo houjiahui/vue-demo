@@ -26,7 +26,7 @@ const mutations = {  //数据变化
 };
 
 const actions = {  //逻辑（ajax，判断...）
-  checkLogin:({commit,dispatch}) => {
+  checkLogin:() => {
     return new Promise((resolve,reject) => {
       axios.get(process.env.API_SERVER + '/api/graph/mask/0')
         .then(function(res){
@@ -36,7 +36,6 @@ const actions = {  //逻辑（ajax，判断...）
           reject()
         });
     });
-
   }
 };
 
