@@ -12,22 +12,9 @@ import userManager from 'components/pages/userManager'
 import resourceManager from 'components/pages/resourceManager'
 import roleManager from 'components/pages/roleManager'
 
-import axios from 'axios'
 import store from '../store'
 
 Vue.use(Router);
-
-function checkLogin(to,from,next){
-  axios.get(process.env.API_SERVER + '/api/graph/mask/0')
-    .then(function(res){
-      next();
-    })
-    .catch(function(err){
-      localStorage.setItem('isLogin',false);
-      localStorage.removeItem('loginUser');
-      next('/Login');
-    });
-}
 
 var router = new Router({
   routes: [
@@ -35,14 +22,14 @@ var router = new Router({
       path: '/',
       name: 'Home',
       component: Home,
-      beforeEnter:checkLogin,
       children:[
         {
           path:'/eventManager',
           name:'eventManager',
           component:eventManager,
           meta:{
-            title:'众筹活动管理'
+            title:'众筹活动管理',
+            requestAuth:true
           }
         },
         {
@@ -50,7 +37,8 @@ var router = new Router({
           name:'maskManager',
           component:maskManager,
           meta:{
-            title:'遮罩图管理'
+            title:'遮罩图管理',
+            requestAuth:true
           }
         },
         {
@@ -58,7 +46,8 @@ var router = new Router({
           name:'galleryManager',
           component:galleryManager,
           meta:{
-            title:'图库管理'
+            title:'图库管理',
+            requestAuth:true
           }
         },
         {
@@ -66,7 +55,8 @@ var router = new Router({
           name:'textureManager',
           component:textureManager,
           meta:{
-            title:'底纹管理'
+            title:'底纹管理',
+            requestAuth:true
           }
         },
         {
@@ -74,7 +64,8 @@ var router = new Router({
           name:'categoryManager',
           component:categoryManager,
           meta:{
-            title:'品类管理'
+            title:'品类管理',
+            requestAuth:true
           }
         },
         {
@@ -82,7 +73,8 @@ var router = new Router({
           name:'cfdOrderManager',
           component:cfdOrderManager,
           meta:{
-            title:'众筹订单管理'
+            title:'众筹订单管理',
+            requestAuth:true
           }
         },
         {
@@ -90,7 +82,8 @@ var router = new Router({
           name:'userManager',
           component:userManager,
           meta:{
-            title:'用户管理'
+            title:'用户管理',
+            requestAuth:true
           }
         },
         {
@@ -98,7 +91,8 @@ var router = new Router({
           name:'resourceManager',
           component:resourceManager,
           meta:{
-            title:'资源管理'
+            title:'资源管理',
+            requestAuth:true
           }
         },
         {
@@ -106,7 +100,8 @@ var router = new Router({
           name:'roleManager',
           component:roleManager,
           meta:{
-            title:'角色管理'
+            title:'角色管理',
+            requestAuth:true
           }
         }
       ],
@@ -120,7 +115,8 @@ var router = new Router({
       name: 'Login',
       component: Login,
       meta:{
-        title:'登录'
+        title:'登录',
+        requestAuth:false
       }
     }
   ]
@@ -129,6 +125,11 @@ var router = new Router({
 router.beforeEach((to,from,next) => {
   store.commit('setLoadingState',true);
   if(to.meta.requestAuth){
+    store.dispatch('checkLogin').then(function(res){
+      next()
+    }).catch(function(err){
+      next('/Login')
+    });
     if(localStorage.getItem('isLogin') && localStorage.getItem('isLogin') == 'true'){
       document.title = to.meta.title;
       store.commit('setPage',to.name);

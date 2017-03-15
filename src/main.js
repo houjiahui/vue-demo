@@ -23,6 +23,12 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 Vue.use(ElementUI);
 
+// /*use vuex-router-sync*/
+// import {sync} from 'vuex-router-sync'
+// sync(store,router);
+
+
+
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */

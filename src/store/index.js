@@ -3,6 +3,7 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios'
 
 Vue.use(Vuex);
 
@@ -25,7 +26,18 @@ const mutations = {  //数据变化
 };
 
 const actions = {  //逻辑（ajax，判断...）
+  checkLogin:({commit,dispatch}) => {
+    return new Promise((resolve,reject) => {
+      axios.get(process.env.API_SERVER + '/api/graph/mask/0')
+        .then(function(res){
+          resolve()
+        })
+        .catch(function(err){
+          reject()
+        });
+    });
 
+  }
 };
 
 const getters = {
