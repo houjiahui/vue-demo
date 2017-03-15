@@ -38,5 +38,6 @@
     float: right;
     line-height: 50px;
     margin-right: 30px;
+    font-size: 14px;
   }
 </style>

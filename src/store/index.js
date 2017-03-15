@@ -7,10 +7,21 @@ import Vuex from 'vuex'
 Vue.use(Vuex);
 
 var state = {
-    loginUser:''
+    loginUser:'',
+    loading:false,
+    nowPage:''
 };
 const mutations = {  //数据变化
-  setLoginUser:(state,arg) => {state.loginUser = arg.username},
+  setLoginUser:(state,arg) => {
+    state.loginUser = arg.username;
+    localStorage.setItem('loginUser',arg.username);
+  },
+  setLoadingState:(state,arg) => {
+    state.loading = arg
+  },
+  setPage:(state,arg) => {
+    state.nowPage = arg;
+  }
 };
 
 const actions = {  //逻辑（ajax，判断...）
@@ -18,7 +29,9 @@ const actions = {  //逻辑（ajax，判断...）
 };
 
 const getters = {
-  loginUser:(state) => state.loginUser
+  loginUser:(state) => state.loginUser!=''?state.loginUser:localStorage.getItem('loginUser'),
+  loading:(state) => state.loading,
+  nowPage:(state) => state.nowPage
 };
 
 

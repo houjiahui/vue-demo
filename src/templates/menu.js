@@ -1,0 +1,77 @@
+/**
+ * Created by liuzhichao on 2017/3/15.
+ */
+const menu = [
+  {
+    text:'活动管理',
+    submenu:[
+      {
+        text:'活动管理',
+        name:'eventManager',
+        path:'eventManager'
+      }
+    ]
+  },
+  {
+    text:'图库管理',
+    submenu:[
+      {
+        text:'mask管理',
+        name:'maskManager',
+        path:'maskManager'
+      },
+      {
+        text:'图库管理',
+        name:'galleryManager',
+        path:'galleryManager'
+      },
+      {
+        text:'底纹管理',
+        name:'textureManager',
+        path:'textureManager'
+      }
+    ]
+  },
+  {
+    text:'商品模板管理',
+    submenu:[
+      {
+        text:'品类管理',
+        name:'categoryManager',
+        path:'categoryManager'
+      }
+    ]
+  },
+  {
+    text:'生产订单管理',
+    submenu:[
+      {
+        text:'众筹订单管理',
+        name:'cfdOrderManager',
+        path:'cfdOrderManager'
+      }
+    ]
+  },
+  {
+    text:'权限管理',
+    submenu:[
+      {
+        text:'用户管理',
+        name:'userManager',
+        path:'userManager'
+      },
+      {
+        text:'资源管理',
+        name:'resourceManager',
+        path:'resourceManager'
+      },
+      {
+        text:'角色管理',
+        name:'roleManager',
+        path:'roleManager'
+      }
+    ]
+  }
+];
+
+export default menu;

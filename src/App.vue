@@ -5,9 +5,11 @@
 </template>
 
 <script>
-export default {
-  name: 'app'
-}
+  import {mapState} from 'vuex'
+  export default {
+    name: 'app',
+    computed:mapState(['loading'])
+  }
 </script>
 <style scoped>
   #app{
