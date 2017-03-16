@@ -23,13 +23,11 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 Vue.use(ElementUI);
 
-// /*use vuex-router-sync*/
-// import {sync} from 'vuex-router-sync'
-// sync(store,router);
-
-
-
 Vue.config.productionTip = false;
+
+/*import momentjs*/
+import moment from 'moment';
+Vue.prototype.moment = moment;
 
 /* eslint-disable no-new */
 new Vue({
