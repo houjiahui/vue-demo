@@ -5,7 +5,7 @@
       <el-breadcrumb-item>活动管理</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="h1">活动列表</div>
-    <el-button type="primary" size="large">发起活动</el-button>
+    <el-button type="primary" size="large" @click="$router.push('/addEvent')">发起活动</el-button>
     <div class="table">
       <el-table :data="tableData.list" border stripe style="width: 100%">
         <el-table-column type="selection" width="50" align="center"></el-table-column>
@@ -35,7 +35,23 @@
             <span>{{scope.row.goal}} / {{scope.row.current_count}}　({{Math.round((scope.row.current_count / scope.row.goal * 100 ))}}%)</span>
           </template>
         </el-table-column>
-        <el-table-column prop="address" label="" ></el-table-column>
+        <el-table-column label="" align="center">
+          <template scope="scope">
+            <el-dropdown menu-align="end">
+              <span class="el-dropdown-link">
+                更多操作<i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item @click.native="$router.push('/editEvent/'+scope.row.id)">编辑活动</el-dropdown-item>
+                <el-dropdown-item>添加/编辑商品</el-dropdown-item>
+                <el-dropdown-item>导出到Excel</el-dropdown-item>
+                <el-dropdown-item>切换状态至"准备生产"</el-dropdown-item>
+                <el-dropdown-item>切换状态至"正在生产中"</el-dropdown-item>
+                <el-dropdown-item divided>删除</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <div class="pagination">
@@ -47,6 +63,12 @@
         :total="tableData.total">
       </el-pagination>
     </div>
+    <el-dialog title="添加/编辑活动" :modal-append-to-body="modalMaskAppendToBody" ref="addEditEvent" size="tiny">
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog('addEditEvent')">取 消</el-button>
+        <el-button type="primary">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -55,15 +77,7 @@
       name:'eventManager',
       methods:{
         formatEventState(row){
-            let state = {
-              '-9' : '全部',
-              '0' : '准备',
-              '10' : '正在进行',
-              '20' : '已结束',
-              '30' : '失败',
-              '40' : '完成'
-            };
-            return state[row.status];
+            return this.eventState[row.status]; 
         },
         updateStatus(data){
             let _this = this;
@@ -82,6 +96,7 @@
             return new Promise((resolve,reject) => {
               _this.$http.get(process.env.API_SERVER + '/api/event?eventKey='+eventKey+'&status='+status+'&startTime='+startTime+'&endTime='+endTime+'&pageSize=20&pageNo='+pageNo)
                 .then((res) => {
+                  console.log(res);
                   resolve(res)
                 })
                 .catch((err) => {
@@ -101,6 +116,7 @@
       },
       mounted(){
           let _this = this;
+          _this.eventInfo = _this.emptyEvent;
           let nowPage = _this.$route.query.pageNo?_this.$route.query.pageNo:1;
           Promise.all([_this.updateStatus({}),_this.getEvent('',-9,'','',nowPage)])
             .then((res) => {
@@ -117,7 +133,16 @@
       },
       data() {
         return {
-          tableData:{}
+          tableData:{},
+          eventState:{
+            '-9' : '全部',
+            '0' : '准备',
+            '10' : '正在进行',
+            '20' : '已结束',
+            '30' : '失败',
+            '40' : '完成'
+          },
+          modalMaskAppendToBody:false
         }
       },
       computed:mapGetters(['nowPage']),

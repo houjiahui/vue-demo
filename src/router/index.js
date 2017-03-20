@@ -12,6 +12,7 @@ import cfdOrderManager from 'components/pages/cfdOrderManager'
 import userManager from 'components/pages/userManager'
 import resourceManager from 'components/pages/resourceManager'
 import roleManager from 'components/pages/roleManager'
+import eventEditor from 'components/pages/eventEditor'
 
 import store from '../store'
 
@@ -40,6 +41,24 @@ var router = new Router({
           component:eventManager,
           meta:{
             title:'众筹活动管理',
+            requireAuth:true
+          }
+        },
+        {
+          path:'/addEvent',
+          name:'addEvent',
+          component:eventEditor,
+          meta:{
+            title:'添加新活动',
+            requireAuth:true
+          }
+        },
+        {
+          path:'/editEvent/:id',
+          name:'editEvent',
+          component:eventEditor,
+          meta:{
+            title:'编辑活动',
             requireAuth:true
           }
         },

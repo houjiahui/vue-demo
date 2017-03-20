@@ -29,3 +29,10 @@ html,body{
 .text-smaller{
   font-size: 12px;
 }
+span.el-dropdown-link{
+  cursor: pointer!important;
+}
+.el-dropdown-menu__item{
+  font-size: 14px!important;
+  line-height: 28px!important;
+}

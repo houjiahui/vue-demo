@@ -6,7 +6,7 @@
         <sidebar></sidebar>
       </div>
       <div class="mainview" v-loading="loading" element-loading-text="拼命加载中">
-        <router-view class="view"></router-view>
+          <router-view class="view"></router-view>
       </div>
     </div>
     <v-footer></v-footer>

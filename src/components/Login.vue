@@ -82,7 +82,7 @@
         ...mapMutations(['setLoginUser'])
     },
     mounted(){
-        if(localStorage.getItem('username') && localStorage.getItem('password')){
+        if(localStorage.getItem('username')){
             this.username = localStorage.getItem('username');
             this.checked = true;
         }
