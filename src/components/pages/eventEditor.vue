@@ -10,7 +10,7 @@
   </div>
 </template>
 <script>
-  import {mapMutations} from 'vuex'
+  import {mapMutations,mapActions} from 'vuex'
   export default{
     name:'eventEditor',
     data(){
@@ -41,40 +41,49 @@
       getCategoryList(){
           let _this = this;
           return new Promise((resolve,reject) => {
-              _this.$http.get(process.env.API_SERVER + '/api/category')
-                .then((res) => {
-                  _this.categoryList = res.data.result;
-                  resolve(res);
-                })
-                .catch((err) => {
-                  _this.$notify({
-                    title:'获取分类信息失败',
-                    message:'请检查网络或确认是否拥有该权限',
-                    type:'error'
-                  });
-                  reject(err);
+          	_this.omNetwork({
+              tag:'getCategoryList',
+              type:'get',
+              url:process.env.API_SERVER + '/api/category',
+              data:{}
+            }).then((res) => {
+                _this.categoryList = res.data.result;
+                resolve(res);
+              })
+              .catch((err) => {
+                _this.$notify({
+                  title:'获取分类信息失败',
+                  message:'请检查网络或确认是否拥有该权限',
+                  type:'error'
                 });
+                reject(err);
+              });
           });
       },
       getEventInfo(eventId){
           let _this = this;
           return new Promise((resolve,reject) => {
-              _this.$http.get(process.env.API_SERVER + '/api/event?eventKey=' + eventId)
-                .then((res) => {
-                  _this.eventInfo = res.data.result;
-                  resolve(res);
-                })
-                .catch((err) => {
-                  _this.$notify({
-                    title:'获取活动信息失败',
-                    message:'请检查网络或确认是否拥有该权限',
-                    type:'error'
-                  });
-                  reject(err);
+            _this.omNetwork({
+              tag:'getEventInfo',
+              type:'get',
+              url:process.env.API_SERVER + '/api/event?eventKey=' + eventId,
+              data:{}
+            }).then((res) => {
+                _this.eventInfo = res.data.result;
+                resolve(res);
+              })
+              .catch((err) => {
+                _this.$notify({
+                  title:'获取活动信息失败',
+                  message:'请检查网络或确认是否拥有该权限',
+                  type:'error'
                 });
-          })
+                reject(err);
+              });
+          });
       },
       ...mapMutations(['setLoadingState']),
+      ...mapActions(['omNetwork'])
     },
     mounted(){
       let _this = this;
@@ -90,8 +99,12 @@
           });
       }else{
         _this.$nextTick(function () {
-          _this.newEvent = true;
-          _this.setLoadingState(false);
+          _this.getCategoryList()
+            .then((res) => {
+              _this.newEvent = true;
+              _this.setLoadingState(false);
+            })
+            .catch();
         });
       }
     }

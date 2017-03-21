@@ -25,7 +25,7 @@
 </template>
 
 <script>
-  import {mapMutations} from 'vuex'
+  import {mapMutations,mapActions} from 'vuex'
   export default{
     name:'Login',
     data(){
@@ -57,29 +57,34 @@
           if(_this.checked){
               localStorage.setItem('username',_this.username);
           }
+          _this.omNetwork({
+            tag:'doLogin',
+            type:'post',
+            url:process.env.API_SERVER + '/api/login?username='+_this.username+'&password='+_this.password,
+            data:{},
+          }).then(function(res){
+            if(res.data.status == 200){
+              _this.$notify({
+                title:'登录成功',
+                message:res.data.result,
+                type:'success'
+              });
+              _this.setLoginUser({username:_this.username});
+              _this.$router.push('/')
+            }else{
+              _this.$notify({
+                title:'登录失败',
+                message:res.data.result,
+                type:'error'
+              });
+            }
+          }).catch(function(err){
+            console.log('err:',err);
+          });
 
-          _this.$http.post(process.env.API_SERVER + '/api/login?username='+_this.username+'&password='+_this.password)
-            .then(function(res){
-                if(res.data.status == 200){
-                  _this.$notify({
-                    title:'登录成功',
-                    message:res.data.result,
-                    type:'success'
-                  });
-                  _this.setLoginUser({username:_this.username});
-                  _this.$router.push('/')
-                }else{
-                  _this.$notify({
-                    title:'登录失败',
-                    message:res.data.result,
-                    type:'error'
-                  });
-                }
-            }).catch(function(err){
-                console.log('err:',err);
-            });
         },
-        ...mapMutations(['setLoginUser'])
+        ...mapMutations(['setLoginUser']),
+        ...mapActions(['omNetwork'])
     },
     mounted(){
         if(localStorage.getItem('username')){

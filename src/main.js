@@ -9,11 +9,6 @@ import store from './store'
 import lodash from 'lodash'
 Vue.use(lodash);
 
-/*axios settings*/
-import axios from 'axios';
-Vue.prototype.$http = axios;
-axios.defaults.withCredentials = true;
-
 /*import third party filter for vue2.x*/
 import filter from 'vue-filter'
 Vue.use(filter);

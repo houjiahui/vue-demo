@@ -4,24 +4,41 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+axios.defaults.withCredentials = true;
 
 Vue.use(Vuex);
 
-var state = {
+const state = {
     loginUser:'',
     loading:false,
-    nowPage:''
+    nowPage:'',
+    requestList:{},
+    requestCache:{}
 };
 const mutations = {  //数据变化
-  setLoginUser:(state,arg) => {
-    state.loginUser = arg.username;
-    localStorage.setItem('loginUser',arg.username);
+  setLoginUser:(state,payload) => {
+    state.loginUser = payload.username;
+    localStorage.setItem('loginUser',payload.username);
   },
-  setLoadingState:(state,arg) => {
-    state.loading = arg
+  setLoadingState:(state,payload) => {
+    state.loading = payload
   },
-  setPage:(state,arg) => {
-    state.nowPage = arg;
+  setPage:(state,payload) => {
+    state.nowPage = payload;
+  },
+  setRequestLock:(state,payload) => {
+    state.requestList[payload] = true;
+  },
+  setRequestUnlock:(state,payload) => {
+    delete state.requestList[payload];
+  },
+  setRequestCache:(state,payload) => {
+    console.log(payload);
+    state.requestCache = {};
+    state.requestCache.type = payload.type;
+    state.requestCache.url = payload.url;
+    state.requestCache.data = payload.data;
+    payload.headers?state.requestCache.headers = payload.headers:state.requestCache.headers = {};
   }
 };
 
@@ -36,13 +53,70 @@ const actions = {  //逻辑（ajax，判断...）
           reject()
         });
     });
+  },
+  omNetwork:({commit,dispatch},payload) => {
+    let tag = payload.tag;
+    let url = payload.url;
+    let type = payload.type;
+    let data = payload.data;
+    return new Promise((resolve,reject) => {
+      Promise.all([dispatch('checkRequestLock',tag),dispatch('sendRequest',{url:url,type:type,data:data})])
+        .then((res) => {
+          commit('setRequestUnlock',tag);
+          resolve(res[1]);
+        })
+        .catch((err) => {
+          commit('setRequestUnlock',tag);
+          reject(err);
+        });
+    });
+  },
+  checkRequestLock:({commit,dispatch},payload) => {
+    return new Promise((resolve,reject) => {
+      if(!state.requestList[payload]){
+        commit('setRequestLock',payload);
+        resolve();
+      }else{
+        reject({err:'不能重复请求'});
+      }
+    });
+  },
+  sendRequest:({commit,dispatch},payload) => {
+    payload.type = payload.type.toLowerCase();
+    commit('setRequestCache',{type:payload.type,url:payload.url,data:payload.data});
+    switch (payload.type){
+      case 'get':
+      case 'put':
+      case 'patch':
+      case 'delete':
+      case 'post':
+        return new Promise((resolve,reject) => {
+          axios({
+            method:payload.type,
+            url:payload.url,
+            data:payload.data
+          }).then((res) => {
+            resolve(res);
+          }).catch((err) => {
+            reject(err)
+          });
+        });
+        break;
+      case 'postmultipart':
+        let formData = new FormData();
+        
+        return new Promise((resolve,reject) => {
+        
+        });
+        break;
+    }
   }
 };
 
 const getters = {
   loginUser:(state) => state.loginUser!=''?state.loginUser:localStorage.getItem('loginUser'),
   loading:(state) => state.loading,
-  nowPage:(state) => state.nowPage
+  nowPage:(state) => state.nowPage,
 };
 
 

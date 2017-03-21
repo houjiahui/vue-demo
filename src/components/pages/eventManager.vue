@@ -45,7 +45,7 @@
                 <el-dropdown-item @click.native="$router.push('/editEvent/'+scope.row.id)">编辑活动</el-dropdown-item>
                 <el-dropdown-item>添加/编辑商品</el-dropdown-item>
                 <el-dropdown-item>导出到Excel</el-dropdown-item>
-                <el-dropdown-item>切换状态至"准备生产"</el-dropdown-item>
+                <el-dropdown-item @click.native="setEventToPreProduct(scope.row.id)">切换状态至"准备生产"</el-dropdown-item>
                 <el-dropdown-item>切换状态至"正在生产中"</el-dropdown-item>
                 <el-dropdown-item divided>删除</el-dropdown-item>
               </el-dropdown-menu>
@@ -72,19 +72,23 @@
   </div>
 </template>
 <script>
-  import {mapMutations,mapGetters} from 'vuex'
+  import {mapMutations,mapActions,mapGetters} from 'vuex'
   export default{
       name:'eventManager',
       methods:{
         formatEventState(row){
-            return this.eventState[row.status]; 
+            return this.eventState[row.status];
         },
         updateStatus(data){
             let _this = this;
             return new Promise((resolve,reject) => {
-              _this.$http.patch(process.env.API_SERVER + '/api/event',data)
-                .then((res) => {
-                  resolve(res);
+              _this.omNetwork({
+                tag:'updateStatus',
+                type:'patch',
+                url:process.env.API_SERVER + '/api/event',
+                data:data
+              }).then((res) => {
+                  resolve(res)
                 })
                 .catch((err) => {
                   reject(err)
@@ -94,15 +98,40 @@
         getEvent(eventKey,status,startTime,endTime,pageNo){
             let _this = this;
             return new Promise((resolve,reject) => {
-              _this.$http.get(process.env.API_SERVER + '/api/event?eventKey='+eventKey+'&status='+status+'&startTime='+startTime+'&endTime='+endTime+'&pageSize=20&pageNo='+pageNo)
-                .then((res) => {
-                  console.log(res);
+            	  _this.omNetwork({
+                  tag:'getEvent',
+                  type:'get',
+                  url:process.env.API_SERVER + '/api/event?eventKey='+eventKey+'&status='+status+'&startTime='+startTime+'&endTime='+endTime+'&pageSize=20&pageNo='+pageNo,
+                  data:{}
+                }).then((res) => {
                   resolve(res)
                 })
                 .catch((err) => {
                   reject(err)
                 });
             });
+        },
+        setEventToPreProduct(eventId){
+            let _this = this;
+            _this.omNetwork({
+              tag:'setEventToPreProduct',
+              type:'patch',
+              url:process.env.API_SERVER + '/api/event/' + eventId + '/order',
+              data:{}
+            }).then((res) => {
+                _this.$notify({
+                  title:'操作已完成',
+                  message:'状态已更改为"准备生产"',
+                  type:'success'
+                });
+              })
+              .catch((err) => {
+                _this.notify({
+                  title:'出现错误',
+                  message:'更改状态失败',
+                  type:'error'
+                })
+              });
         },
         changePageNo(currentPage){
             let _this = this;
@@ -113,6 +142,7 @@
             this.setLoadingState(false);
         },
         ...mapMutations(['setLoadingState']),
+        ...mapActions(['omNetwork'])
       },
       mounted(){
           let _this = this;
@@ -126,7 +156,7 @@
               _this.setLoadingState(false);
               _this.$notify({
                 title:'出现错误',
-                message:err,
+                message:err.err,
                 type:'error'
               })
             })
