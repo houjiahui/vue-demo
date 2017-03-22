@@ -5,7 +5,7 @@
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="h1">用户列表</div>
-    <el-popover ref="addUser" placement="bottom-start" width="500" v-model="addUserPopover" @hide="clearUserInfo">
+    <el-popover ref="addUser" placement="bottom-start" width="500" v-model="addUserPopover" @show="clearUserInfo" @hide="clearUserInfo">
       <div style="text-align: left; box-sizing: border-box;padding-right: 10px;">
         <el-form ref="addUserForm" :model="userInfo" label-width="80px">
           <el-form-item label="登录账户">
@@ -52,7 +52,7 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template scope="scope">
-            <el-popover ref="editUser" placement="left-start" width="500" v-model="editPopover[scope.row.id]" @hide="clearUserInfo">
+            <el-popover ref="editUser" placement="left-start" width="500" v-model="editPopover[scope.row.id]" @show="editUser(scope.row)">
               <div style="text-align: left; box-sizing: border-box;padding-right: 10px;">
                 <el-form ref="addUserForm" :model="userInfo" label-width="80px">
                   <el-form-item label="登录账户">
@@ -82,7 +82,7 @@
                 </div>
               </div>
             </el-popover>
-            <el-button type="text" v-popover:editUser @click="editUser(scope.row)">编辑</el-button>
+            <el-button type="text" v-popover:editUser>编辑</el-button>
 
             <el-popover ref="deleteUser" placement="left" width="200" v-model="deletePopover[scope.row.id]">
               <p>确定要删除用户"{{scope.row.description}}"吗？</p>
@@ -180,11 +180,14 @@
         },
         editUser(user){
         	var _this = this;
-        	_this.userInfo = user;
-        	_this.userInfo.password = '';
-        	for(let i = 0 ; i < user.role.length ; i++){
-            _this.selectedRole.push(user.role[i].id);
-          }
+        	_this.$nextTick(() => {
+            _this.userInfo = JSON.parse(JSON.stringify(user));
+            _this.userInfo.password = '';
+            _this.selectedRole.splice(0);
+            for(let i = 0 ; i < user.role.length ; i++){
+              _this.selectedRole.push(user.role[i].id);
+            }
+          });
         },
         submitUserData(type,uid){
         	let _this = this;
