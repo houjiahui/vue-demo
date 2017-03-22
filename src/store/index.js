@@ -33,7 +33,6 @@ const mutations = {  //数据变化
     delete state.requestList[payload];
   },
   setRequestCache:(state,payload) => {
-    console.log(payload);
     state.requestCache = {};
     state.requestCache.type = payload.type;
     state.requestCache.url = payload.url;
@@ -43,10 +42,14 @@ const mutations = {  //数据变化
 };
 
 const actions = {  //逻辑（ajax，判断...）
-  checkLogin:() => {
+  checkLogin:({dispatch}) => {
     return new Promise((resolve,reject) => {
-      axios.get(process.env.API_SERVER + '/api/graph/mask/0')
-        .then(function(res){
+      dispatch('omNetwork',{
+        tag:'checkLogin',
+        type:'get',
+        url:process.env.API_SERVER + '/api/graph/mask/0',
+        data:{}
+      }).then(function(res){
           resolve()
         })
         .catch(function(err){
