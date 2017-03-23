@@ -37,7 +37,6 @@ const mutations = {  //数据变化
     state.requestCache.type = payload.type;
     state.requestCache.url = payload.url;
     state.requestCache.data = payload.data;
-    payload.headers?state.requestCache.headers = payload.headers:state.requestCache.headers = {};
   }
 };
 

@@ -39,11 +39,11 @@
     <div class="table">
       <el-table :data="userList.list | sortBy('id')" border stripe style="width: 100%">
         <el-table-column prop="id" label="id" align="center" width="100"></el-table-column>
-        <el-table-column prop="name" label="登录账户" align="center" width="250"></el-table-column>
-        <el-table-column prop="description" label="用户别名" align="center" width="200"></el-table-column>
-        <el-table-column prop="mobile" label="电话" align="center" width="150"></el-table-column>
-        <el-table-column prop="email" label="邮箱" align="center" width="250"></el-table-column>
-        <el-table-column label="所属角色" align="left" header-align="center" min-width="350">
+        <el-table-column prop="name" label="登录账户" align="center" width="300"></el-table-column>
+        <el-table-column prop="description" label="用户别名" align="center" width="250"></el-table-column>
+        <el-table-column prop="mobile" label="电话" align="center" width="200"></el-table-column>
+        <el-table-column prop="email" label="邮箱" align="center" width="300"></el-table-column>
+        <el-table-column label="所属角色" align="left" header-align="center" min-width="280">
           <template scope="scope">
             <el-button type="primary" v-for="(role,index) in scope.row.role" :key="index" size="small">
               {{role.description}}
@@ -180,14 +180,12 @@
         },
         editUser(user){
         	var _this = this;
-        	_this.$nextTick(() => {
-            _this.userInfo = JSON.parse(JSON.stringify(user));
-            _this.userInfo.password = '';
-            _this.selectedRole.splice(0);
-            for(let i = 0 ; i < user.role.length ; i++){
-              _this.selectedRole.push(user.role[i].id);
-            }
-          });
+          _this.userInfo = user;
+          _this.userInfo.password = '';
+          _this.selectedRole.splice(0);
+          for(let i = 0 ; i < user.role.length ; i++){
+            _this.selectedRole.push(user.role[i].id);
+          }
         },
         submitUserData(type,uid){
         	let _this = this;
