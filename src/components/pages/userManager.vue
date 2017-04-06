@@ -166,6 +166,15 @@
               })
           });
         },
+        refreshList(){
+        	let _this = this;
+          _this.deletePopover = [];
+          _this.editPopover = [];
+          for(let i = 0 ; i < _this.userList.list.length ; i++){
+            this.$set(_this.deletePopover,_this.userList.list[i].id,false);
+            this.$set(_this.editPopover,_this.userList.list[i].id,false);
+          }
+        },
         clearUserInfo(){
           this.userInfo = {
             name:'',
@@ -232,6 +241,7 @@
                 _this.getUserList()
                   .then((res) => {
                     _this.userList = res.data.result;
+                    _this.refreshList();
                     _this.addUserPopover = false;
                     _this.$notify({
                       title:'操作已完成',
@@ -268,6 +278,7 @@
                 _this.getUserList()
                   .then((res) => {
                     _this.userList = res.data.result;
+                    _this.refreshList();
                     _this.hideEditPopover(uid);
                     _this.$notify({
                       title:'操作已完成',
@@ -306,7 +317,7 @@
               _this.getUserList()
                 .then((res) => {
                   _this.userList = res.data.result;
-                  _this.addUserPopover = false;
+                  _this.refreshList();
                   _this.$notify({
                     title:'操作已完成',
                     message:'用户已被删除。',
@@ -314,7 +325,6 @@
                   });
                 })
                 .catch((err) => {
-                  _this.addUserPopover = false;
                   _this.$notify({
                     title:'发生错误',
                     message:err.err,
@@ -323,7 +333,6 @@
                 })
             })
             .catch((err) => {
-              _this.addUserPopover = false;
               _this.$notify({
                 title:'发生错误',
                 message:err,
@@ -341,10 +350,7 @@
           	  _this.roleList = res[0].data.result;
           	  _this.userList = res[1].data.result;
               _this.setLoadingState(false);
-              for(let i = 0 ; i < _this.userList.list.length ; i++){
-                this.$set(_this.deletePopover,_this.userList.list[i].id,false);
-                this.$set(_this.editPopover,_this.userList.list[i].id,false);
-              }
+              _this.refreshList();
             })
             .catch((err) => {
               _this.$notify({
