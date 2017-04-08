@@ -3,6 +3,7 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
+import Router from '../router'
 import axios from 'axios'
 axios.defaults.withCredentials = true;
 
@@ -34,6 +35,7 @@ const mutations = {  //数据变化
   },
   setRequestCache:(state,payload) => {
     state.requestCache = {};
+    state.requestCache.tag = payload.tag;
     state.requestCache.type = payload.type;
     state.requestCache.url = payload.url;
     state.requestCache.data = payload.data;
@@ -68,7 +70,9 @@ const actions = {  //逻辑（ajax，判断...）
           resolve(res[1]);
         })
         .catch((err) => {
+          commit('setRequestCache',{tag:payload.tag,type:payload.type,url:payload.url,data:payload.data});
           commit('setRequestUnlock',tag);
+          Router.replace({name:'Login'});
           reject(err);
         });
     });
@@ -85,7 +89,6 @@ const actions = {  //逻辑（ajax，判断...）
   },
   sendRequest:({commit,dispatch},payload) => {
     payload.type = payload.type.toLowerCase();
-    commit('setRequestCache',{type:payload.type,url:payload.url,data:payload.data});
     switch (payload.type){
       case 'get':
       case 'put':

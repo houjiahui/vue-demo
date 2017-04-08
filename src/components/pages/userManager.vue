@@ -117,8 +117,8 @@
           roleList:{},
           selectedRole:[],
           addUserPopover:false,
-          editPopover:{},
-          deletePopover:{}
+          editPopover:[],
+          deletePopover:[]
         }
       },
       methods:{
@@ -166,8 +166,9 @@
               })
           });
         },
-        refreshList(){
+        refreshList(data){
         	let _this = this;
+          _this.userList = data;
           _this.deletePopover = [];
           _this.editPopover = [];
           for(let i = 0 ; i < _this.userList.list.length ; i++){
@@ -240,8 +241,7 @@
               .then((res) => {
                 _this.getUserList()
                   .then((res) => {
-                    _this.userList = res.data.result;
-                    _this.refreshList();
+                    _this.refreshList(res.data.result);
                     _this.addUserPopover = false;
                     _this.$notify({
                       title:'操作已完成',
@@ -277,8 +277,7 @@
               .then((res) => {
                 _this.getUserList()
                   .then((res) => {
-                    _this.userList = res.data.result;
-                    _this.refreshList();
+                    _this.refreshList(res.data.result);
                     _this.hideEditPopover(uid);
                     _this.$notify({
                       title:'操作已完成',
@@ -316,8 +315,7 @@
           }).then((res) => {
               _this.getUserList()
                 .then((res) => {
-                  _this.userList = res.data.result;
-                  _this.refreshList();
+                  _this.refreshList(res.data.result);
                   _this.$notify({
                     title:'操作已完成',
                     message:'用户已被删除。',
@@ -348,9 +346,8 @@
           Promise.all([_this.getRoleList(),_this.getUserList()])
             .then((res) => {
           	  _this.roleList = res[0].data.result;
-          	  _this.userList = res[1].data.result;
               _this.setLoadingState(false);
-              _this.refreshList();
+              _this.refreshList(res[1].data.result);
             })
             .catch((err) => {
               _this.$notify({

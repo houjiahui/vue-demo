@@ -79,7 +79,11 @@
               });
             }
           }).catch(function(err){
-            console.log('err:',err);
+            _this.$notify({
+              title:'登录失败',
+              message:err,
+              type:'error'
+            });
           });
 
         },

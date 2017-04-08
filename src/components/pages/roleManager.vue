@@ -89,8 +89,8 @@
       		roleList:[],
           resourceList:[],
           addRolePopover:false,
-          editPopover:{},
-          deletePopover:{},
+          editPopover:[],
+          deletePopover:[],
           roleInfo:{
       			name:'',
             description:'',
@@ -136,6 +136,14 @@
         },
       	submitRoleData(type,rid){
         	let _this = this;
+          if(_this.roleInfo.name.length == 0 || _this.roleInfo.name == ''){
+            _this.$notify({
+              title:'错误',
+              message:'请输入角色名',
+              type:'error'
+            });
+            return false;
+          }
           let authorities = {};
           let submitData = {
           	role:_this.roleInfo.name,
