@@ -8,7 +8,6 @@
     <el-button type="primary" size="large" @click="$router.push('/addEvent')">发起活动</el-button>
     <div class="table">
       <el-table :data="tableData.list" border stripe style="width: 100%">
-        <el-table-column type="selection" width="50" align="center"></el-table-column>
         <el-table-column prop="name" label="活动名称(编号)" align="center" width="350">
           <template scope="scope">
             <span>{{scope.row.name}}({{scope.row.id}})</span>
@@ -44,10 +43,10 @@
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item @click.native="$router.push('/editEvent/'+scope.row.id)">编辑活动</el-dropdown-item>
                 <el-dropdown-item>添加/编辑商品</el-dropdown-item>
-                <el-dropdown-item>导出到Excel</el-dropdown-item>
+                <el-dropdown-item @click.native="exportToExcel(scope.row.id)">导出到Excel</el-dropdown-item>
                 <el-dropdown-item @click.native="setEventToPreProduct(scope.row.id)">切换状态至"准备生产"</el-dropdown-item>
-                <el-dropdown-item>切换状态至"正在生产中"</el-dropdown-item>
-                <el-dropdown-item divided>删除</el-dropdown-item>
+                <el-dropdown-item @click.native="setEventToProducting(scope.row.id)">切换状态至"正在生产中"</el-dropdown-item>
+                <el-dropdown-item divided @click.native="deleteEvent(scope.row.id)">删除</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -73,9 +72,18 @@
 </template>
 <script>
   import {mapMutations,mapActions,mapGetters} from 'vuex'
+  var FileSaver = require('../../assets/FileSaver.min.js');
   export default{
       name:'eventManager',
       methods:{
+        dataURL2Blob:function(dataURL){
+          var arr = dataURL.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+          while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          return new Blob([u8arr], {type:mime});
+        },
         formatEventState(row){
             return this.eventState[row.status];
         },
@@ -132,6 +140,93 @@
                   type:'error'
                 })
               });
+        },
+        setEventToProducting(eventId){
+          let _this = this;
+          _this.omNetwork({
+            tag:'setEventToProducting',
+            type:'patch',
+            url:process.env.API_SERVER + '/api/event/' + eventId + '/order/producting',
+            data:{}
+          }).then((res) => {
+              _this.$notify({
+                title:'操作已完成',
+                message:'状态已更改为"正在生产中"',
+                type:'success'
+              });
+            })
+            .catch((err) => {
+              _this.$notify({
+                title:'出现错误',
+                message:'更改状态失败',
+                type:'error'
+              })
+            });
+        },
+        exportToExcel(eventId){
+        	let _this = this;
+        	_this.omNetwork({
+            tag:'downloadOrderInfo',
+            type:'get',
+            url:process.env.API_SERVER + '/api/event/'+eventId+'/order',
+            data:{}
+          }).then((res) => {
+        		if(!res.data || res.data == ""){
+              _this.$notify({
+                title:'完成',
+                message:'没有新的订单信息，无需导出',
+                type:'success'
+              })
+            }else{
+        			let blob = _this.dataURL2Blob('data:application/vnd.ms-excel;base64,' + res.data);
+        			FileSaver.saveAs(blob,'活动'+eventId+'详情.xls');
+              _this.$notify({
+                title:'导出完成',
+                message:'订单信息已导出至"' + '活动'+eventId+'详情.xls' + '"',
+                type:'success'
+              })
+            }
+          }).catch((err) => {
+            _this.$notify({
+              title:'出现错误',
+              message:'获取订单信息失败',
+              type:'error'
+            })
+          })
+        },
+        deleteEvent(eventId){
+          let _this = this;
+          _this.omNetwork({
+            tag:'deleteEvent',
+            type:'delete',
+            url:process.env.API_SERVER + '/api/event/' + eventId,
+            data:{}
+          }).then((res) => {
+              let nowPage = _this.$route.query.pageNo?_this.$route.query.pageNo:1;
+              _this.getEvent('',-9,'','',nowPage)
+                .then((res) => {
+                  _this.setTableData(res.data.result);
+                  _this.$notify({
+                    title:'删除成功',
+                    message:"该活动已被删除",
+                    type:'success'
+                  })
+                })
+                .catch((err) => {
+                  _this.$notify({
+                    title:'出现错误',
+                    message:err.err,
+                    type:'error'
+                  })
+                });
+            })
+            .catch((err) => {
+              _this.$notify({
+                title:'删除失败',
+                message:err,
+                type:'error'
+              })
+            });
         },
         changePageNo(currentPage){
             let _this = this;

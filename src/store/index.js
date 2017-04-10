@@ -70,9 +70,11 @@ const actions = {  //逻辑（ajax，判断...）
           resolve(res[1]);
         })
         .catch((err) => {
-          commit('setRequestCache',{tag:payload.tag,type:payload.type,url:payload.url,data:payload.data});
           commit('setRequestUnlock',tag);
-          Router.replace({name:'Login'});
+          if(tag != 'checkLogin'){
+            commit('setRequestCache',{tag:tag,type:type,url:url,data:data});
+            Router.replace({name:'Login'});
+          }
           reject(err);
         });
     });
@@ -122,6 +124,7 @@ const getters = {
   loginUser:(state) => state.loginUser!=''?state.loginUser:localStorage.getItem('loginUser'),
   loading:(state) => state.loading,
   nowPage:(state) => state.nowPage,
+  requestCache:(state) => state.requestCache
 };
 
 

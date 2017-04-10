@@ -1,43 +1,106 @@
 <template>
   <div>
     <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>{{newEvent?'添加新活动':'编辑活动'}}</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ name:'Home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ name:'eventManager' }">活动管理</el-breadcrumb-item>
+      <el-breadcrumb-item>{{newEvent?'创建新活动':'编辑活动'}}</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="h1">
-      {{newEvent?'添加新活动':'编辑活动'}}
+      {{newEvent?'创建新活动':'编辑活动'}}
     </div>
+    <el-form ref="form" :model="eventInfo" label-width="90px" style="width: 60%;margin: 30px auto">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="活动名称">
+              <el-input placeholder="在此输入活动名称" v-model="eventInfo.name"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属品类">
+              <el-select  placeholder="请选择品类" style="width: 100%" v-model="category">
+                <el-option v-for="item in categoryList" :label="item.name" :value="item.id" :key="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="活动描述">
+          <el-input placeholder="在此输入活动描述" v-model="eventInfo.description"></el-input>
+        </el-form-item>
+        <el-form-item label="活动备注">
+          <el-input type="textarea" :rows="5" resize="none" placeholder="在此输入活动备注"  v-model="eventInfo.eventnote"></el-input>
+        </el-form-item>
+        <el-form-item label="活动时间">
+          <el-date-picker type="datetimerange" placeholder="选择时间范围" v-model="timeScope">
+          </el-date-picker>
+        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="发起者ID">
+              <el-input placeholder="在此输入活动发起者ID" v-model="ownerId"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="目标数量">
+              <el-input placeholder="在此输入目标数量" v-model="eventInfo.goal"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="商品预览图">
+          <dropzone id="imageUploader1" class="myStyle" url="localhost" :thumbnailHeight="150" :thumbnailWidth="150" :useFontAwesome="false" :useCustomDropzoneOptions="true" :dropzoneOptions="dzOptions" @vdropzone-file-added="addFileList1" @vdropzone-removed-file="removeFileList1"></dropzone>
+        </el-form-item>
+      <el-form-item label="商品描述图">
+        <dropzone id="imageUploader2" class="myStyle" url="localhost" :thumbnailHeight="150" :thumbnailWidth="150" :useFontAwesome="false" :useCustomDropzoneOptions="true" :dropzoneOptions="dzOptions" @vdropzone-file-added="addFileList2" @vdropzone-removed-file="removeFileList2"></dropzone>
+      </el-form-item>
+        <el-form-item>
+          <el-button type="primary" >立即创建</el-button>
+          <el-button @click="goBack()">取消</el-button>
+        </el-form-item>
+      </el-form>
   </div>
 </template>
 <script>
   import {mapMutations,mapActions} from 'vuex'
+  import Dropzone from 'vue2-dropzone'
+  import jQuery from 'jquery'
   export default{
     name:'eventEditor',
     data(){
         return{
           eventInfo:{
-            current_count:'',
+            name:'',
             description:'',
-            disabled:false,
-            endTime:'',
             eventnote:'',
             goal:'',
-            id:'',
-            name:'',
-            product:{
-              category:{
-                id:''
-              }
-            },
-            serverTime:'',
-            status:'',
           },
           ownerId:'',
-          categoryList:{},
-          newEvent:false
+          category:'',
+          timeScope:[],
+          categoryList:[],
+          fileList1:{},
+          fileList2:{},
+          newEvent:false,
+          dzOptions:{
+            autoProcessQueue: false,
+            addRemoveLinks:true
+          }
         }
     },
     methods:{
+    	goBack(){
+    		this.$router.replace({name:'eventManager'})
+      },
+    	addFileList1(file){
+    		this.fileList1[file.name] = file;
+      },
+      removeFileList1(file){
+        delete this.fileList1[file.name];
+      },
+      addFileList2(file){
+        this.fileList2[file.name] = file;
+      },
+      removeFileList2(file){
+        delete this.fileList2[file.name];
+      },
       getCategoryList(){
           let _this = this;
           return new Promise((resolve,reject) => {
@@ -107,6 +170,14 @@
             .catch();
         });
       }
+    },
+    components:{
+    	Dropzone
     }
   }
 </script>
+<style scoped>
+  .form{
+    width: 50%;
+  }
+</style>

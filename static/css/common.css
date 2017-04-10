@@ -36,3 +36,32 @@ span.el-dropdown-link{
   font-size: 14px!important;
   line-height: 28px!important;
 }
+.vue-dropzone.myStyle{
+  border:1px solid #bfcbd9!important;
+  border-radius: 4px!important;
+  color:#97a8be
+}
+.vue-dropzone.myStyle .dz-preview .dz-error-mark, .vue-dropzone .dz-preview .dz-success-mark{
+  width: 54px!important;
+  height: 54px!important;
+  top: 0!important;
+  bottom: 0!important;
+  left: 0!important;
+  right: 0!important;
+  margin: auto!important;
+}
+.vue-dropzone.myStyle .dz-progress{
+  display: none!important;
+}
+.vue-dropzone.myStyle .dz-preview .dz-remove{
+  line-height: 14px!important;
+  padding: 5px!important;
+  margin: 0 10px!important;
+  bottom:0.5em!important;
+}
+.dropzone .dz-preview .dz-details .dz-size{
+  margin-bottom: 0.5em!important;
+}
+.dropzone .dz-preview .dz-details{
+  padding: 1em 0.5em!important;
+}
