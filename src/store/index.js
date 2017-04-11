@@ -111,9 +111,20 @@ const actions = {  //逻辑（ajax，判断...）
         break;
       case 'postmultipart':
         let formData = new FormData();
-        
+        for(let key in payload.data){
+          formData.append(key,payload.data[key])
+        }
         return new Promise((resolve,reject) => {
-        
+          axios({
+            method:'post',
+            url:payload.url,
+            data:formData,
+            headers: {'content-type': 'multipart/form-data'}
+          }).then((res) => {
+            resolve(res);
+          }).catch((err) => {
+            reject(err)
+          });
         });
         break;
     }

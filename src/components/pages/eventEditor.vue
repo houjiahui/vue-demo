@@ -52,7 +52,7 @@
         <dropzone id="imageUploader2" class="myStyle" url="localhost" :thumbnailHeight="150" :thumbnailWidth="150" :useFontAwesome="false" :useCustomDropzoneOptions="true" :dropzoneOptions="dzOptions" @vdropzone-file-added="addFileList2" @vdropzone-removed-file="removeFileList2"></dropzone>
       </el-form-item>
         <el-form-item>
-          <el-button type="primary" >立即创建</el-button>
+          <el-button type="primary" @click="submitEvent()">{{newEvent?'立即创建':'保存修改'}}</el-button>
           <el-button @click="goBack()">取消</el-button>
         </el-form-item>
       </el-form>
@@ -90,16 +90,132 @@
     		this.$router.replace({name:'eventManager'})
       },
     	addFileList1(file){
-    		this.fileList1[file.name] = file;
+    		let _this = this;
+    		_this.fileList1[file.name] = file;
+    		//limit files number
+        (function(){
+        	let count = 0;
+        	if(Object.keys(_this.fileList1).length > 4){
+        		for(let key in _this.fileList1){
+        			count ++;
+        			if(count > 4){
+        				jQuery(_this.fileList1[key].previewElement).remove();
+        				_this.removeFileList1(_this.fileList1[key]);
+              }
+            }
+          }
+        })();
       },
       removeFileList1(file){
         delete this.fileList1[file.name];
       },
       addFileList2(file){
-        this.fileList2[file.name] = file;
+      	let _this = this;
+        _this.fileList2[file.name] = file;
+        //limit files number
+        (function(){
+          let count = 0;
+          if(Object.keys(_this.fileList2).length > 1){
+            for(let key in _this.fileList2){
+              count ++;
+              if(count > 1){
+                jQuery(_this.fileList2[key].previewElement).remove();
+                _this.removeFileList2(_this.fileList2[key]);
+              }
+            }
+          }
+        })();
       },
       removeFileList2(file){
         delete this.fileList2[file.name];
+      },
+      submitEvent(type){
+      	let _this = this;
+      	let params = {
+      		data:{}
+        };
+      	if(_this.eventInfo.name == "" || _this.eventInfo.name.length == 0){
+      		_this.$notify({
+            title:'出现错误',
+            message:'活动名称不能为空！',
+            type:'error'
+          });
+      		return false;
+        }
+        if(_this.timeScope.length == 0){
+          _this.$notify({
+            title:'出现错误',
+            message:'请选择活动起止时间！',
+            type:'error'
+          });
+          return false;
+        }
+        if(_this.category == ''){
+          _this.$notify({
+            title:'出现错误',
+            message:'请选择商品所属品类！',
+            type:'error'
+          });
+          return false;
+        }
+        (function(){
+        	let count = 1;
+        	for(var key in _this.fileList1){
+        		params.data['file' + count] = _this.fileList1[key];
+        		count ++;
+          }
+        })();
+
+        for(let key in _this.fileList2){
+          params.data['description'] = _this.fileList2[key];
+        }
+        params.data.name = _this.eventInfo.name;
+        params.data.ownerid = _this.ownerId;
+        params.data.categoryid = _this.category;
+
+        if(Object.keys(_this.fileList1).length > 0 || Object.keys(_this.fileList2).length > 0){
+          _this.omNetwork({
+            tag:'postProduct',
+            type:'postMultiPart',
+            url:process.env.API_SERVER + '/api/product/',
+            data:params.data
+          }).then((res) => {
+            let startTime = _this.moment(_this.timeScope[0]).format('YYYY-MM-DD HH:mm:ss');
+            let endTime = _this.moment(_this.timeScope[1]).format('YYYY-MM-DD HH:mm:ss');
+            let productId = res.data.result.id;
+            let data = {
+              name:_this.eventInfo.name,
+              description:_this.eventInfo.description
+            };
+            _this.omNetwork({
+              tag:'postEvent',
+              type:'postMultipart',
+              url:process.env.API_SERVER + '/api/event?startTime=' + startTime + '&endTime=' + endTime + '&status=&goal=' + _this.eventInfo.goal + '&productid=' + productId + '&eventnote=' + _this.eventInfo.eventnote,
+              data:data
+            }).then((res) => {
+              _this.$notify({
+                title:_this.newEvent?'添加活动成功':'修改活动成功',
+                message:'',
+                type:'success'
+              });
+              _this.goBack();
+            }).catch((err) => {
+              _this.$notify({
+                title:_this.newEvent?'添加活动失败':'修改活动失败',
+                message:'',
+                type:'error'
+              });
+            });
+          }).catch((err) => {
+            _this.$notify({
+              title:_this.newEvent?'添加活动失败':'修改活动失败',
+              message:'',
+              type:'error'
+            });
+          })
+        }else{
+
+        }
       },
       getCategoryList(){
           let _this = this;
@@ -132,7 +248,10 @@
               url:process.env.API_SERVER + '/api/event?eventKey=' + eventId,
               data:{}
             }).then((res) => {
-                _this.eventInfo = res.data.result;
+                _this.eventInfo = res.data.result.list[0];
+                if(!_this.newEvent){
+                	_this.category = _this.eventInfo.product.category.id;
+                }
                 resolve(res);
               })
               .catch((err) => {
