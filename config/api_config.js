@@ -5,6 +5,6 @@
  * Created by liuzhichao on 2017/2/17.
  */
 module.exports = {
-  "development":'"http://120.26.51.19:8110/orimuse-admin"',
+  "development":'"http://120.26.51.19:8220/orimuse-admin"',
   "production":'"PRD-API-SERVER"'
 };

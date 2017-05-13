@@ -2,7 +2,7 @@
   <div id="footer">
     2017 &copy; orimuse. all right reserved.
     <div class="right">
-      orimuse management system
+      Built with Vue.js
     </div>
   </div>
 </template>

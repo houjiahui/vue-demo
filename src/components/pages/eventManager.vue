@@ -20,18 +20,18 @@
         </el-table-column>
         <el-table-column prop="startTime" label="开始时间" align="center">
           <template scope="scope">
-            <span>{{scope.row.startTime | date('%Y-%m-%d %T')}}</span>
+            <span v-if="scope.row.startTime">{{scope.row.startTime | date('%Y-%m-%d %T')}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="endTime" label="结束时间" align="center">
           <template scope="scope">
-            <span>{{scope.row.endTime | date('%Y-%m-%d %T')}}</span>
+            <span v-if="scope.row.endTime">{{scope.row.endTime | date('%Y-%m-%d %T')}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" align="center" :formatter="formatEventState"></el-table-column>
         <el-table-column prop="address" label="目标/达成　(%)" align="center">
           <template scope="scope">
-            <span>{{scope.row.goal}} / {{scope.row.current_count}}　({{Math.round((scope.row.current_count / scope.row.goal * 100 ))}}%)</span>
+            <span v-if="scope.row.type == 1">{{scope.row.goal}} / {{scope.row.current_count}}　({{Math.round((scope.row.current_count / scope.row.goal * 100 ))}}%)</span>
           </template>
         </el-table-column>
         <el-table-column label="" align="center">
