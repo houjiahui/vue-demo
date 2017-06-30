@@ -10,7 +10,7 @@
       <el-table :data="tableData.list" border stripe style="width: 100%">
         <el-table-column prop="name" label="活动名称(编号)" align="center" width="350">
           <template scope="scope">
-            <span>{{scope.row.name}}({{scope.row.id}})</span>
+            <a :href="scope.row.shareLink" target="_blank">{{scope.row.name}}({{scope.row.id}})</a>
           </template>
         </el-table-column>
         <el-table-column prop="eventnote" label="活动备注" align="center" >
@@ -41,11 +41,13 @@
                 更多操作<i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item v-show="scope.row.type == 2">推荐至APP首页</el-dropdown-item>
                 <el-dropdown-item @click.native="$router.push('/editEvent/'+scope.row.id)">编辑活动</el-dropdown-item>
                 <el-dropdown-item>添加/编辑商品</el-dropdown-item>
                 <el-dropdown-item @click.native="exportToExcel(scope.row.id)">导出到Excel</el-dropdown-item>
                 <el-dropdown-item @click.native="setEventToPreProduct(scope.row.id)">切换状态至"准备生产"</el-dropdown-item>
                 <el-dropdown-item @click.native="setEventToProducting(scope.row.id)">切换状态至"正在生产中"</el-dropdown-item>
+                <el-dropdown-item @click.native="setEventToProducting(scope.row.id)">刷新缓存</el-dropdown-item>
                 <el-dropdown-item divided @click.native="deleteEvent(scope.row.id)">删除</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -93,7 +95,7 @@
               _this.omNetwork({
                 tag:'updateStatus',
                 type:'patch',
-                url:process.env.API_SERVER + '/api/event',
+                url:_this.API_SERVER + '/api/event',
                 data:data
               }).then((res) => {
                   resolve(res)
@@ -104,12 +106,12 @@
             });
         },
         getEvent(eventKey,status,startTime,endTime,pageNo){
-            let _this = this;
+          let _this = this;
             return new Promise((resolve,reject) => {
             	  _this.omNetwork({
                   tag:'getEvent',
                   type:'get',
-                  url:process.env.API_SERVER + '/api/event?eventKey='+eventKey+'&status='+status+'&startTime='+startTime+'&endTime='+endTime+'&pageSize=20&pageNo='+pageNo,
+                  url:_this.API_SERVER + '/api/event?eventKey='+eventKey+'&status='+status+'&startTime='+startTime+'&endTime='+endTime+'&pageSize=20&pageNo='+ (pageNo?pageNo:1),
                   data:{}
                 }).then((res) => {
                   resolve(res)
@@ -124,7 +126,7 @@
             _this.omNetwork({
               tag:'setEventToPreProduct',
               type:'patch',
-              url:process.env.API_SERVER + '/api/event/' + eventId + '/order',
+              url:_this.API_SERVER + '/api/event/' + eventId + '/order',
               data:{}
             }).then((res) => {
                 _this.$notify({
@@ -146,7 +148,7 @@
           _this.omNetwork({
             tag:'setEventToProducting',
             type:'patch',
-            url:process.env.API_SERVER + '/api/event/' + eventId + '/order/producting',
+            url:_this.API_SERVER + '/api/event/' + eventId + '/order/producting',
             data:{}
           }).then((res) => {
               _this.$notify({
@@ -168,7 +170,7 @@
         	_this.omNetwork({
             tag:'downloadOrderInfo',
             type:'get',
-            url:process.env.API_SERVER + '/api/event/'+eventId+'/order',
+            url:_this.API_SERVER + '/api/event/'+eventId+'/order',
             data:{}
           }).then((res) => {
         		if(!res.data || res.data == ""){
@@ -199,7 +201,7 @@
           _this.omNetwork({
             tag:'deleteEvent',
             type:'delete',
-            url:process.env.API_SERVER + '/api/event/' + eventId,
+            url:_this.API_SERVER + '/api/event/' + eventId,
             data:{}
           }).then((res) => {
               let nowPage = _this.$route.query.pageNo?_this.$route.query.pageNo:1;
@@ -270,7 +272,7 @@
           modalMaskAppendToBody:false
         }
       },
-      computed:mapGetters(['nowPage']),
+      computed:mapGetters(['nowPage','API_SERVER','CACHE_API_APP','CACHE_API_WEB','WEBSITE_DOMAIN']),
       watch:{
           $route(to,from){
             let _this = this;

@@ -25,7 +25,7 @@
 </template>
 
 <script>
-  import {mapMutations,mapActions} from 'vuex'
+  import {mapMutations,mapActions,mapGetters} from 'vuex'
   export default{
     name:'Login',
     data(){
@@ -60,7 +60,7 @@
           _this.omNetwork({
             tag:'doLogin',
             type:'post',
-            url:process.env.API_SERVER + '/api/login?username='+_this.username+'&password='+_this.password,
+            url:_this.API_SERVER + '/api/login?username='+_this.username+'&password='+_this.password,
             data:{},
           }).then(function(res){
             if(res.data.status == 200){
@@ -90,6 +90,7 @@
         ...mapMutations(['setLoginUser']),
         ...mapActions(['omNetwork'])
     },
+    computed:mapGetters(['API_SERVER']),
     mounted(){
         if(localStorage.getItem('username')){
             this.username = localStorage.getItem('username');

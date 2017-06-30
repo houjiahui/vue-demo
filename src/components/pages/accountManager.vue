@@ -5,7 +5,7 @@
 <script>
   import {mapMutations} from 'vuex'
   export default{
-      name:'cfdOrderManager',
+      name:'accountManager',
       methods:mapMutations(['setLoadingState']),
       mounted(){
           var _this = this;

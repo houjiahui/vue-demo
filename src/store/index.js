@@ -10,11 +10,24 @@ axios.defaults.withCredentials = true;
 Vue.use(Vuex);
 
 const state = {
-    loginUser:'',
-    loading:false,
-    nowPage:'',
-    requestList:{},
-    requestCache:{}
+  CODE_REQUEST_UNAUTHORIZED:403,
+  
+  API_SERVER:'http://120.26.51.19:8110',
+  API_PATH:'/orimuse-admin',
+  
+  CACHE_API_APP:'https://api.orimuse.com',
+  CACHE_PATH_APP:'/api/cache/event',
+  
+  CACHE_API_WEB:'http://www.orimuse.com',
+  CACHE_PATH_WEB:'/api/cache',
+  
+  WEBSITE_DOMAIN:'http://www.orimuse.com',
+  
+  loginUser:'',
+  loading:false,
+  nowPage:'',
+  requestList:{},
+  requestCache:{}
 };
 const mutations = {  //数据变化
   setLoginUser:(state,payload) => {
@@ -43,21 +56,6 @@ const mutations = {  //数据变化
 };
 
 const actions = {  //逻辑（ajax，判断...）
-  checkLogin:({dispatch}) => {
-    return new Promise((resolve,reject) => {
-      dispatch('omNetwork',{
-        tag:'checkLogin',
-        type:'get',
-        url:process.env.API_SERVER + '/api/graph/mask/0',
-        data:{}
-      }).then(function(res){
-          resolve()
-        })
-        .catch(function(err){
-          reject()
-        });
-    });
-  },
   omNetwork:({commit,dispatch},payload) => {
     let tag = payload.tag;
     let url = payload.url;
@@ -66,16 +64,21 @@ const actions = {  //逻辑（ajax，判断...）
     return new Promise((resolve,reject) => {
       Promise.all([dispatch('checkRequestLock',tag),dispatch('sendRequest',{url:url,type:type,data:data})])
         .then((res) => {
+          console.log(Router.currentRoute);
           commit('setRequestUnlock',tag);
           resolve(res[1]);
         })
         .catch((err) => {
           commit('setRequestUnlock',tag);
-          if(tag != 'checkLogin'){
-            commit('setRequestCache',{tag:tag,type:type,url:url,data:data});
-            Router.replace({name:'Login'});
+          if(err.msg){
+            reject(err);
+          }else{
+            if(err.response.status === state.CODE_REQUEST_UNAUTHORIZED){
+              commit('setRequestCache',{tag:tag,type:type,url:url,data:data});
+              Router.replace({name:'Login'});
+            }
+            reject(err.response);
           }
-          reject(err);
         });
     });
   },
@@ -85,7 +88,7 @@ const actions = {  //逻辑（ajax，判断...）
         commit('setRequestLock',payload);
         resolve();
       }else{
-        reject({err:'不能重复请求'});
+        reject({msg:'不能重复请求'});
       }
     });
   },
@@ -105,7 +108,7 @@ const actions = {  //逻辑（ajax，判断...）
           }).then((res) => {
             resolve(res);
           }).catch((err) => {
-            reject(err)
+            reject(err);
           });
         });
         break;
@@ -132,6 +135,10 @@ const actions = {  //逻辑（ajax，判断...）
 };
 
 const getters = {
+  API_SERVER:(state) => state.API_SERVER + state.API_PATH,
+  CACHE_API_APP:(state) => state.CACHE_API_APP + state.CACHE_PATH_APP,
+  CACHE_API_WEB:(state) => state.CACHE_API_WEB + state.CACHE_PATH_WEB,
+  WEBSITE_DOMAIN:(state) => state.WEBSITE_DOMAIN,
   loginUser:(state) => state.loginUser!=''?state.loginUser:localStorage.getItem('loginUser'),
   loading:(state) => state.loading,
   nowPage:(state) => state.nowPage,

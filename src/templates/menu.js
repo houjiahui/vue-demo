@@ -13,6 +13,16 @@ const menu = [
     ]
   },
   {
+    text:'生产订单管理',
+    submenu:[
+      {
+        text:'众筹订单管理',
+        name:'cfdOrderManager',
+        path:'cfdOrderManager'
+      }
+    ]
+  },
+  {
     text:'图库管理',
     submenu:[
       {
@@ -33,6 +43,16 @@ const menu = [
     ]
   },
   {
+    text:'用户管理',
+    submenu:[
+      {
+        text:'用户账户管理',
+        name:'accountManager',
+        path:'accountManager'
+      }
+    ]
+  },
+  {
     text:'商品模板管理',
     submenu:[
       {
@@ -43,12 +63,17 @@ const menu = [
     ]
   },
   {
-    text:'生产订单管理',
+    text:'店铺模板管理',
     submenu:[
       {
-        text:'众筹订单管理',
-        name:'cfdOrderManager',
-        path:'cfdOrderManager'
+        text:'店铺模板管理(移动端)',
+        name:'templateManager',
+        path:'templateManager?platform=1'
+      },
+      {
+        text:'店铺模板管理(PC端)',
+        name:'templateManager',
+        path:'templateManager?platform=2'
       }
     ]
   },

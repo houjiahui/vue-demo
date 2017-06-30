@@ -61,7 +61,7 @@
   </div>
 </template>
 <script>
-  import {mapMutations,mapActions} from 'vuex'
+  import {mapMutations,mapActions,mapGetters} from 'vuex'
   export default{
       name:'categoryManager',
       data(){
@@ -129,7 +129,7 @@
             _this.omNetwork({
               tag:'addCategory',
               type:'post',
-              url:process.env.API_SERVER + '/api/category',
+              url:_this.API_SERVER + '/api/category',
               data:submitData
             }).then((res) => {
             	  _this.getCategoryList(1)
@@ -162,7 +162,7 @@
             _this.omNetwork({
               tag:'editCategory',
               type:'put',
-              url:process.env.API_SERVER + '/api/category/' + cid,
+              url:_this.API_SERVER + '/api/category/' + cid,
               data:submitData
             }).then((res) => {
                 _this.getCategoryList(1)
@@ -198,7 +198,7 @@
           _this.omNetwork({
             tag:'deleteCategory',
             type:'delete',
-            url:process.env.API_SERVER + '/api/category/' + categoryId,
+            url:_this.API_SERVER + '/api/category/' + categoryId,
             data:{}
           }).then((res) => {
               _this.getCategoryList()
@@ -232,7 +232,7 @@
             _this.omNetwork({
               tag:'getCategoryList',
               type:'get',
-              url:process.env.API_SERVER + '/api/category?pageSize=20&pageNo=' + pageNo,
+              url:_this.API_SERVER + '/api/category?pageSize=20&pageNo=' + pageNo,
               data:{}
             }).then((res) => {
             	  resolve(res);
@@ -245,6 +245,7 @@
       	...mapMutations(['setLoadingState']),
         ...mapActions(['omNetwork'])
       },
+      computed:mapGetters(['API_SERVER']),
       mounted(){
           var _this = this;
           _this.getCategoryList(1)

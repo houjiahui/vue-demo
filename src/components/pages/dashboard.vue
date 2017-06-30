@@ -1,7 +1,6 @@
 <template>
   <div id="dashboard">
     欢迎回来，{{loginUser}}
-
   </div>
 </template>
 <script>
@@ -12,9 +11,11 @@
       computed:mapGetters(['loginUser','requestCache']),
       mounted(){
           var _this = this;
-          setTimeout(function(){
-            _this.setLoadingState(false);
-          },300);
+          _this.$nextTick(function(){
+            setTimeout(function(){
+              _this.setLoadingState(false);
+            },300);
+          });
       }
   }
 </script>

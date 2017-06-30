@@ -99,7 +99,7 @@
   </div>
 </template>
 <script>
-  import {mapMutations,mapActions} from 'vuex'
+  import {mapMutations,mapActions,mapGetters} from 'vuex'
   export default{
       name:'userManager',
       data(){
@@ -140,7 +140,7 @@
         		_this.omNetwork({
               tag:'getRoleList',
               type:'get',
-              url:process.env.API_SERVER + '/api/admin/role',
+              url:_this.API_SERVER + '/api/admin/role',
             })
               .then((res) => {
         			  resolve(res);
@@ -156,7 +156,7 @@
             _this.omNetwork({
               tag:'getUserList',
               type:'get',
-              url:process.env.API_SERVER + '/api/admin/user'
+              url:_this.API_SERVER + '/api/admin/user'
             })
               .then((res) => {
             	  resolve(res);
@@ -235,7 +235,7 @@
             _this.omNetwork({
                 tag:'submitUserData',
                 type:'post',
-                url:process.env.API_SERVER + '/api/admin/user/?userJSON=' + JSON.stringify(submitData),
+                url:_this.API_SERVER + '/api/admin/user/?userJSON=' + JSON.stringify(submitData),
                 data:{}
               })
               .then((res) => {
@@ -271,7 +271,7 @@
             _this.omNetwork({
                 tag:'submitUserData',
                 type:'patch',
-                url:process.env.API_SERVER + '/api/admin/user/'+ uid +'?userJSON=' + JSON.stringify(submitData),
+                url:_this.API_SERVER + '/api/admin/user/'+ uid +'?userJSON=' + JSON.stringify(submitData),
                 data:{}
               })
               .then((res) => {
@@ -310,7 +310,7 @@
         	_this.omNetwork({
             tag:'deleteUser',
             type:'delete',
-            url:process.env.API_SERVER + '/api/admin/user/' + userId,
+            url:_this.API_SERVER + '/api/admin/user/' + userId,
             data:{}
           }).then((res) => {
               _this.getUserList()
@@ -341,6 +341,7 @@
         ...mapMutations(['setLoadingState']),
         ...mapActions(['omNetwork'])
       },
+      computed:mapGetters(['API_SERVER']),
       mounted(){
           var _this = this;
           Promise.all([_this.getRoleList(),_this.getUserList()])

@@ -81,7 +81,7 @@
   </div>
 </template>
 <script>
-  import {mapMutations,mapActions} from 'vuex'
+  import {mapMutations,mapActions,mapGetters} from 'vuex'
   export default{
       name:'roleManager',
       data(){
@@ -175,7 +175,7 @@
             _this.omNetwork({
                 tag:'addRole',
                 type:'post',
-                url:process.env.API_SERVER + '/api/admin/role/',
+                url:_this.API_SERVER + '/api/admin/role/',
                 data:submitData
               })
               .then((res) => {
@@ -211,7 +211,7 @@
             _this.omNetwork({
                 tag:'editRole',
                 type:'patch',
-                url:process.env.API_SERVER + '/api/admin/role/' + rid,
+                url:_this.API_SERVER + '/api/admin/role/' + rid,
                 data:submitData
               })
               .then((res) => {
@@ -251,7 +251,7 @@
       			_this.omNetwork({
               tag:'getRoleList',
               type:'get',
-              url:process.env.API_SERVER + '/api/admin/role',
+              url:_this.API_SERVER + '/api/admin/role',
               data:{}
             }).then((res) => {
       				  resolve(res)
@@ -267,7 +267,7 @@
             _this.omNetwork({
               tag:'getResourceList',
               type:'get',
-              url:process.env.API_SERVER + '/api/admin/resource',
+              url:_this.API_SERVER + '/api/admin/resource',
               data:{}
             }).then((res) => {
                 resolve(res)
@@ -291,7 +291,7 @@
           _this.omNetwork({
             tag:'deleteRole',
             type:'delete',
-            url:process.env.API_SERVER + '/api/admin/role/' + roleId,
+            url:_this.API_SERVER + '/api/admin/role/' + roleId,
             data:{}
           }).then((res) => {
               _this.getRoleList()
@@ -323,6 +323,7 @@
         ...mapMutations(['setLoadingState']),
         ...mapActions(['omNetwork'])
       },
+      computed:mapGetters(['API_SERVER']),
       mounted(){
           let _this = this;
           Promise.all([_this.getRoleList(),_this.getResourceList()])

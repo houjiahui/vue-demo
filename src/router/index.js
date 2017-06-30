@@ -13,6 +13,8 @@ import userManager from 'components/pages/userManager'
 import resourceManager from 'components/pages/resourceManager'
 import roleManager from 'components/pages/roleManager'
 import eventEditor from 'components/pages/eventEditor'
+import accountManager from 'components/pages/accountManager'
+
 
 import store from '../store'
 
@@ -133,11 +135,20 @@ var router = new Router({
             title:'角色管理',
             requireAuth:true
           }
+        },
+        {
+          path:'/accountManager',
+          name:'accountManager',
+          component:accountManager,
+          meta:{
+            title:'用户账户管理',
+            requireAuth:true
+          }
         }
       ],
       meta:{
         title:'首页',
-        requireAuth:true
+        requireAuth:false
       }
     },
     {
@@ -155,13 +166,17 @@ var router = new Router({
 router.beforeEach((to,from,next) => {
   store.commit('setLoadingState',true);
   if(to.meta.requireAuth){
-    store.dispatch('checkLogin').then(function(){
+    store.dispatch('omNetwork',{
+      tag:'checkLogin',
+      type:'get',
+      url: store.getters.API_SERVER + '/api/graph/mask/0',
+      data:{}
+    })
+    .then(function(res){
       document.title = to.meta.title;
       store.commit('setPage',to.name);
-      next()
-    }).catch(function(){
-      next('/Login')
-    });
+      next();
+    })
   }else{
     document.title = to.meta.title;
     store.commit('setPage',to.name);

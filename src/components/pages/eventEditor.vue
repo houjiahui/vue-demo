@@ -17,7 +17,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="所属品类">
-              <el-select  placeholder="请选择品类" style="width: 100%" v-model="category">
+              <el-select  placeholder="请选择品类" style="width: 100%" v-model="category" :disabled="!newEvent">
                 <el-option v-for="item in categoryList" :label="item.name" :value="item.id" :key="item.id"></el-option>
               </el-select>
             </el-form-item>
@@ -29,14 +29,24 @@
         <el-form-item label="活动备注">
           <el-input type="textarea" :rows="5" resize="none" placeholder="在此输入活动备注"  v-model="eventInfo.eventnote"></el-input>
         </el-form-item>
-        <el-form-item label="活动时间">
-          <el-date-picker type="datetimerange" placeholder="选择时间范围" v-model="timeScope">
-          </el-date-picker>
-        </el-form-item>
         <el-row>
           <el-col :span="12">
+            <el-form-item label="活动类型">
+              <el-select  placeholder="请选择活动类型" style="width: 100%" v-model="type" :disabled="!newEvent">
+                <el-option v-for="item in EVENT_TYPE_MAP" :label="item.name" :value="item.id" :key="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="发起者ID">
-              <el-input placeholder="在此输入活动发起者ID" v-model="ownerId"></el-input>
+              <el-input placeholder="在此输入活动发起者ID" v-model="ownerId" :disabled="!newEvent"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-show="type == 1">
+          <el-col :span="12">
+            <el-form-item label="活动时间">
+              <el-date-picker type="datetimerange" placeholder="选择时间范围" v-model="timeScope" style="width: 100%"></el-date-picker>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -59,19 +69,24 @@
   </div>
 </template>
 <script>
-  import {mapMutations,mapActions} from 'vuex'
+  import {mapMutations,mapActions,mapGetters} from 'vuex'
   import Dropzone from 'vue2-dropzone'
   import jQuery from 'jquery'
   export default{
     name:'eventEditor',
     data(){
         return{
+        	EVENT_TYPE_MAP:[
+            {id:1,name:'众筹'},
+            {id:2,name:'自营'}
+          ],
           eventInfo:{
             name:'',
             description:'',
             eventnote:'',
             goal:'',
           },
+          type:'',
           ownerId:'',
           category:'',
           timeScope:[],
@@ -81,7 +96,7 @@
           newEvent:false,
           dzOptions:{
             autoProcessQueue: false,
-            addRemoveLinks:true
+            addRemoveLinks: true
           }
         }
     },
@@ -142,7 +157,7 @@
           });
       		return false;
         }
-        if(_this.timeScope.length == 0){
+        if(_this.type == 1 && _this.timeScope.length == 0){
           _this.$notify({
             title:'出现错误',
             message:'请选择活动起止时间！',
@@ -172,50 +187,51 @@
         params.data.name = _this.eventInfo.name;
         params.data.ownerid = _this.ownerId;
         params.data.categoryid = _this.category;
+        params.data.type = _this.type;
 
-        if(Object.keys(_this.fileList1).length > 0 || Object.keys(_this.fileList2).length > 0){
+        _this.omNetwork({
+          tag:'postProduct',
+          type:'postMultiPart',
+          url:_this.API_SERVER + '/api/product/',
+          data:params.data
+        }).then((res) => {
+          let startTime = _this.moment(_this.timeScope[0]).format('YYYY-MM-DD HH:mm:ss');
+          let endTime = _this.moment(_this.timeScope[1]).format('YYYY-MM-DD HH:mm:ss');
+          let productId = res.data.result.id;
+          let data = {
+            name:_this.eventInfo.name,
+            description:_this.eventInfo.description
+          };
+          let url=_this.API_SERVER + '/api/event?productid=' + productId + '&eventnote=' + _this.eventInfo.eventnote + '&type=' + _this.type;
+          if(_this.type == 1){
+            url += '&startTime='+ startTime + '&endTime=' + endTime + '&status=&goal=' + _this.eventInfo.goal;
+          }
           _this.omNetwork({
-            tag:'postProduct',
-            type:'postMultiPart',
-            url:process.env.API_SERVER + '/api/product/',
-            data:params.data
+            tag:'postEvent',
+            type:'postMultipart',
+            url:url,
+            data:data
           }).then((res) => {
-            let startTime = _this.moment(_this.timeScope[0]).format('YYYY-MM-DD HH:mm:ss');
-            let endTime = _this.moment(_this.timeScope[1]).format('YYYY-MM-DD HH:mm:ss');
-            let productId = res.data.result.id;
-            let data = {
-              name:_this.eventInfo.name,
-              description:_this.eventInfo.description
-            };
-            _this.omNetwork({
-              tag:'postEvent',
-              type:'postMultipart',
-              url:process.env.API_SERVER + '/api/event?startTime=' + startTime + '&endTime=' + endTime + '&status=&goal=' + _this.eventInfo.goal + '&productid=' + productId + '&eventnote=' + _this.eventInfo.eventnote,
-              data:data
-            }).then((res) => {
-              _this.$notify({
-                title:_this.newEvent?'添加活动成功':'修改活动成功',
-                message:'',
-                type:'success'
-              });
-              _this.goBack();
-            }).catch((err) => {
-              _this.$notify({
-                title:_this.newEvent?'添加活动失败':'修改活动失败',
-                message:'',
-                type:'error'
-              });
+            _this.$notify({
+              title:_this.newEvent?'添加活动成功':'修改活动成功',
+              message:'',
+              type:'success'
             });
+            _this.goBack();
           }).catch((err) => {
             _this.$notify({
               title:_this.newEvent?'添加活动失败':'修改活动失败',
               message:'',
               type:'error'
             });
-          })
-        }else{
-
-        }
+          });
+        }).catch((err) => {
+          _this.$notify({
+            title:_this.newEvent?'添加活动失败':'修改活动失败',
+            message:err.msg,
+            type:'error'
+          });
+        })
       },
       getCategoryList(){
           let _this = this;
@@ -223,7 +239,7 @@
           	_this.omNetwork({
               tag:'getCategoryList',
               type:'get',
-              url:process.env.API_SERVER + '/api/category',
+              url:_this.API_SERVER + '/api/category',
               data:{}
             }).then((res) => {
                 _this.categoryList = res.data.result;
@@ -245,12 +261,16 @@
             _this.omNetwork({
               tag:'getEventInfo',
               type:'get',
-              url:process.env.API_SERVER + '/api/event?eventKey=' + eventId,
+              url:_this.API_SERVER + '/api/event?eventKey=' + eventId,
               data:{}
             }).then((res) => {
                 _this.eventInfo = res.data.result.list[0];
                 if(!_this.newEvent){
                 	_this.category = _this.eventInfo.product.category.id;
+                	_this.type = _this.eventInfo.type;
+                	if(_this.eventInfo.startTime && _this.eventInfo.endTime){
+                		_this.timeScope = [new Date(_this.eventInfo.startTime),new Date(_this.eventInfo.endTime)];
+                  }
                 }
                 resolve(res);
               })
@@ -267,6 +287,7 @@
       ...mapMutations(['setLoadingState']),
       ...mapActions(['omNetwork'])
     },
+    computed:mapGetters(['API_SERVER']),
     mounted(){
       let _this = this;
       let eventId = _this.$route.params.id;
